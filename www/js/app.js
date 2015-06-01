@@ -13,7 +13,7 @@ document.body.appendChild(canvas);
 
 var ctx = canvas.getContext('2d');
 
-window.addEventListener("resize", resizeCanvas);
+window.onresize = function(){ resizeCanvas(); };
 
 var stats = new Stats();
 stats.setMode(0); // 0: fps, 1: ms
@@ -45,7 +45,7 @@ function draw(){
     //
     ctx.beginPath();
     ctx.arc(200,100,60,0,2*Math.PI);
-    ctx.fillStyle="red";
+    ctx.fillStyle="gray";
     ctx.fill();
 }
 
