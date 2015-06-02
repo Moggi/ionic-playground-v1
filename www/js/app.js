@@ -38,48 +38,50 @@ var update = function () {
 
     var prevTime = Date.now();
 
-    var raio = 10;
     var quantia = 50;
-    var x = raio;
-    var y = raio;
     var velocity = 50;   // pixels/second
+    var rectHeight = 30;
+    var rectWidth = 50;
 
 //================================================================================
 
 
 
 // You can use either `new PIXI.WebGLRenderer`, `new PIXI.CanvasRenderer`, or `PIXI.autoDetectRenderer`
-var renderer = new PIXI.CanvasRenderer(canvasWidth,canvasHeight,{view:canvas,transparent:true});
-
-var stage = new PIXI.Container();
+var renderer = new PIXI.WebGLRenderer(canvasWidth,canvasHeight,{view:canvas,transparent:true});
 
 var graphics = new PIXI.Graphics();
 
-stage.addChild(graphics);
+
+var rect = [];
+
+var iQuantia = 0;
+var tempX = 0;
+var tempY = 0;
+
+while( iQuantia<quantia )
+{
+    tempX += rectWidth +1;
+    if( tempX+rectWidth >= canvasWidth ){
+        tempY += rectHeight + 1;
+        tempY %= canvasHeight;
+        tempX = rectWidth +1;
+    }
+    rect[iQuantia] = new PIXI.Rectangle(tempX,tempY,rectWidth,rectHeight);
+    iQuantia++;
+}
 
 requestAnimationFrame( update );
 function draw()
 {
     graphics.clear();
     graphics.beginFill(0x333333);
-    for( var i=0; i<quantia/2; i++)
-    {
-        var tempX = x +i*2*raio;
-        tempX %=canvasWidth;
-        var tempY = 0;
-        for( var j=0; j<quantia/2; j++)
-        {
-            tempY += 2 * raio;
-            tempY %=canvasHeight;
 
-            graphics.drawCircle(tempX,tempY,raio);
-        }
-    }
+    for( var i=0; i<quantia; i++ )
+        graphics.drawShape(rect[i]);
 
-    // this is the main render call that makes pixi draw your container and its children.
+    
     renderer.render(graphics);
-
-    x += velocity * deltaTime(prevTime);
 }
 
 
