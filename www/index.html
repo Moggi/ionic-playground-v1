@@ -8,65 +8,94 @@
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 
-    <!-- cordova script (this will be a 404 during development) -->
-    <script type="text/javascript" src="cordova.js"></script>
+    <!-- cordova script (this will be a 404 during development) 
+    <script type="text/javascript" src="cordova.js"></script>-->
 
 
-
-    <script id="node-vertex-shader" type="x-shader/x-vertex">
-      uniform vec2 u_resolution;
-      attribute vec2 a_position;
-      attribute vec2 a_center;
-      attribute float a_radius;
-
-      varying vec2 center;
-      varying vec2 resolution;
-      varying float radius;
-
-      void main() {
-        vec2 clipspace = a_position / u_resolution * 2.0 - 1.0;
-        gl_Position = vec4(clipspace * vec2(1, -1), 0, 1);
-
-        radius = a_radius;
-        center = a_center;
-        resolution = u_resolution;
-      }
-    </script>
-
-    <script id="node-fragment-shader" type="x-shader/x-fragment">
-
-      precision mediump float;
-
-      varying vec2 center;
-      varying vec2 resolution;
-      varying float radius;
-
-      void main() {
-        vec4 color0 = vec4(0.0, 0.0, 0.0, 0.0);
-
-        float x = gl_FragCoord.x;
-        float y = resolution[1] - gl_FragCoord.y;
-
-        float dx = center[0] - x;
-        float dy = center[1] - y;
-        float distance = sqrt(dx*dx + dy*dy);
-
-        if ( distance < radius )
-          gl_FragColor = vec4(0.3, 0.3, 0.3, 1.0);
-        else
-          gl_FragColor = color0;
-
-      }
-    </script>
-
-
-    <script type="text/javascript" src="lib/webgl-utils.js"></script>
-    <!--https://raw.githubusercontent.com/html5rocks/www.html5rocks.com/master/content/tutorials/webgl/webgl_fundamentals/static/webgl/resources/webgl-utils.js-->
+    <script type="text/javascript" src="lib/pixi.min.js"></script>
+    <script type="text/javascript" src="lib/p2.min.js"></script>
     <script type="text/javascript" src="lib/stats.min.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
 </head>
 <body>
 
+<!--
+<script type="text/javascript">
+    var renderer, stage, container, graphics, zoom,
+    world, boxShape, boxBody, planeBody, planeShape;
+
+    init();
+    animate();
+
+    function init(){
+
+        // Init p2.js
+        world = new p2.World();
+
+        // Add a box
+        boxShape = new p2.Rectangle(2,1);
+        boxBody = new p2.Body({
+            mass:1,
+            position:[0,2],
+            angularVelocity:1
+        });
+        boxBody.addShape(boxShape);
+        world.addBody(boxBody);
+
+        // Add a plane
+        planeShape = new p2.Plane();
+        planeBody = new p2.Body({ position:[0,-1] });
+        planeBody.addShape(planeShape);
+        world.addBody(planeBody);
+
+        // Pixi.js zoom level
+        zoom = 100;
+
+        // Initialize the stage
+        renderer =  PIXI.autoDetectRenderer(600, 400),
+        stage = new PIXI.Stage();
+
+        // We use a container inside the stage for all our content
+        // This enables us to zoom and translate the content
+        container =     new PIXI.DisplayObjectContainer(),
+        stage.addChild(container);
+
+        // Add the canvas to the DOM
+        document.body.appendChild(renderer.view);
+
+        // Add transform to the container
+        container.position.x =  renderer.width/2; // center at origin
+        container.position.y =  renderer.height/2;
+        container.scale.x =  zoom;  // zoom in
+        container.scale.y = -zoom; // Note: we flip the y axis to make "up" the physics "up"
+
+        // Draw the box.
+        graphics = new PIXI.Graphics();
+        graphics.beginFill(0x555555);
+        graphics.drawRect(-boxShape.width/2, -boxShape.height/2, boxShape.width, boxShape.height);
+
+        // Add the box to our container
+        container.addChild(graphics);
+    }
+
+    // Animation loop
+    function animate(t){
+        t = t || 0;
+        requestAnimationFrame(animate);
+
+        // Move physics bodies forward in time
+        world.step(1/60);
+
+        // Transfer positions of the physics objects to Pixi.js
+        graphics.position.x = boxBody.position[0];
+        graphics.position.y = boxBody.position[1];
+        graphics.rotation =   boxBody.angle;
+
+        // Render scene
+        renderer.render(stage);
+    }
+</script>
+-->
 
 </body>
 </html>
