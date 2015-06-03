@@ -28,9 +28,7 @@ window.onload = function(){
     var engine = Engine.create(document.body, {
       render: {
         options: {
-          wireframes: true,
-          controller:Matter.RenderPixi,
-          showAngleIndicator: true
+          controller:Matter.RenderPixi
         }
       }
     });
@@ -44,8 +42,8 @@ window.onload = function(){
     World.add(engine.world, mouseConstraint);
 
     // create a load of circle bodies
-    var stack = Composites.stack(250, 5, 10, 5, 0, 0, function(x, y, column, row) {
-      return Bodies.circle(x, y, Common.random(30, 31), { friction: .001, restitution: .1, density: 5.5 });
+    var stack = Composites.stack(250, 5, 10, 35, 0, 0, function(x, y, column, row) {
+      return Bodies.circle(x, y, Common.random(20, 21), { friction: .001, restitution: .1, density: 5.5 });
     });
 
     // add boundaries
@@ -56,12 +54,6 @@ window.onload = function(){
       Bodies.rectangle(800 + offset, 300, 50, 600 + 2 * offset, { isStatic: true }),
       Bodies.rectangle(-offset, 300, 50, 600 + 2 * offset, { isStatic: true })
     ]);
-
-    // create function to update output values & manipulate gravity
-    function gravOutputUpdate(id, axis, val) {
-      document.getElementById(id).innerHTML = val;
-      engine.world.gravity[axis] = val;
-    }
 
     // add all of the bodies to the world
     World.add(engine.world, stack);
