@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>#</title>
+
+    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- cordova script (this will be a 404 during development)
+    <script type="text/javascript" src="cordova.js"></script>-->
+
+
+    <script type="text/javascript" src="lib/pixi.min.js"></script>
+    <script type="text/javascript" src="lib/p2.min.js"></script>
+    <!--<script type="text/javascript" src="lib/stats.min.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>-->
+</head>
+
+<!--
+<script type="text/javascript">
+    var renderer, stage, container, graphics, zoom,
+    world, boxShape, boxBody, planeBody, planeShape;
+
+    init();
+    animate();
+
+    function init(){
+
+        // Init p2.js
+        world = new p2.World();
+
+        // Add a box
+        boxShape = new p2.Rectangle(2,1);
+        boxBody = new p2.Body({
+            mass:1,
+            position:[0,2],
+            angularVelocity:1
+        });
+        boxBody.addShape(boxShape);
+        world.addBody(boxBody);
+
+        // Add a plane
+        planeShape = new p2.Plane();
+        planeBody = new p2.Body({ position:[0,-1] });
+        planeBody.addShape(planeShape);
+        world.addBody(planeBody);
+
+        // Pixi.js zoom level
+        zoom = 100;
+
+        // Initialize the stage
+        renderer =  PIXI.autoDetectRenderer(600, 400),
+        stage = new PIXI.Stage();
+
+        // We use a container inside the stage for all our content
+        // This enables us to zoom and translate the content
+        container =     new PIXI.DisplayObjectContainer(),
+        stage.addChild(container);
+
+        // Add the canvas to the DOM
+        document.body.appendChild(renderer.view);
+
+        // Add transform to the container
+        container.position.x =  renderer.width/2; // center at origin
+        container.position.y =  renderer.height/2;
+        container.scale.x =  zoom;  // zoom in
+        container.scale.y = -zoom; // Note: we flip the y axis to make "up" the physics "up"
+
+        // Draw the box.
+        graphics = new PIXI.Graphics();
+        graphics.beginFill(0x555555);
+        graphics.drawRect(-boxShape.width/2, -boxShape.height/2, boxShape.width, boxShape.height);
+
+        // Add the box to our container
+        container.addChild(graphics);
+    }
+
+    // Animation loop
+    function animate(t){
+        t = t || 0;
+        requestAnimationFrame(animate);
+
+        // Move physics bodies forward in time
+        world.step(1/60);
+
+        // Transfer positions of the physics objects to Pixi.js
+        graphics.position.x = boxBody.position[0];
+        graphics.position.y = boxBody.position[1];
+        graphics.rotation =   boxBody.angle;
+
+        // Render scene
+        renderer.render(stage);
+    }
+
+    var canvas, ctx, w, h, world, boxBody, planeBody, mouseConstraint, mouseBody;
+var scaleX = 50, scaleY = -50;
+
+init();
+animate();
+
+function init(){
+
+  // Init canvas
+  canvas = document.getElementById("myCanvas");
+  w = canvas.width;
+  h = canvas.height;
+
+  ctx = canvas.getContext("2d");
+  ctx.lineWidth = 0.05;
+
+  // Init p2.js
+  world = new p2.World();
+
+  // Add a box
+  boxShape = new p2.Rectangle(2,1);
+  boxBody = new p2.Body({
+    mass:1,
+    position:[0,3],
+    angularVelocity:1
+  });
+  boxBody.addShape(boxShape);
+  world.addBody(boxBody);
+
+  // Add a plane
+  planeShape = new p2.Plane();
+  planeBody = new p2.Body();
+  planeBody.addShape(planeShape);
+  world.addBody(planeBody);
+
+  // Create a body for the cursor
+  mouseBody = new p2.Body();
+  world.addBody(mouseBody);
+
+  canvas.addEventListener('mousedown', function(event){
+
+    // Convert the canvas coordinate to physics coordinates
+    var position = getPhysicsCoord(event);
+
+    // Check if the cursor is inside the box
+    var hitBodies = world.hitTest(position, [boxBody]);
+
+    if(hitBodies.length){
+
+      // Move the mouse body to the cursor position
+      mouseBody.position[0] = position[0];
+      mouseBody.position[1] = position[1];
+
+      // Create a RevoluteConstraint.
+      // This constraint lets the bodies rotate around a common point
+      mouseConstraint = new p2.RevoluteConstraint(mouseBody, boxBody, {
+        worldPivot: position,
+        collideConnected:false
+      });
+      world.addConstraint(mouseConstraint);
+    }
+  });
+
+  // Sync the mouse body to be at the cursor position
+  canvas.addEventListener('mousemove', function(event){
+    var position = getPhysicsCoord(event);
+    mouseBody.position[0] = position[0];
+    mouseBody.position[1] = position[1];
+  });
+
+  // Remove the mouse constraint on mouse up
+  canvas.addEventListener('mouseup', function(event){
+    world.removeConstraint(mouseConstraint);
+    mouseConstraint = null;
+  });
+}
+
+// Convert a canvas coordiante to physics coordinate
+function getPhysicsCoord(mouseEvent){
+    var rect = canvas.getBoundingClientRect();
+    var x = mouseEvent.clientX - rect.left;
+    var y = mouseEvent.clientY - rect.top;
+
+    x = (x - w / 2) / scaleX;
+    y = (y - h / 2) / scaleY;
+
+    return [x, y];
+}
+
+function drawbox(){
+  ctx.beginPath();
+  var x = boxBody.position[0],
+      y = boxBody.position[1];
+  ctx.save();
+  ctx.translate(x, y);        // Translate to the center of the box
+  ctx.rotate(boxBody.angle);  // Rotate to the box body frame
+  ctx.rect(-boxShape.width/2, -boxShape.height/2, boxShape.width, boxShape.height);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawPlane(){
+  var y = planeBody.position[1];
+  ctx.moveTo(-w, y);
+  ctx.lineTo( w, y);
+  ctx.stroke();
+}
+
+function render(){
+  // Clear the canvas
+  ctx.clearRect(0,0,w,h);
+
+  // Transform the canvas
+  ctx.save();
+  ctx.translate(w/2, h/2); // Translate to the center
+  ctx.scale(scaleX, scaleY);
+
+  // Draw all bodies
+  drawbox();
+  drawPlane();
+
+  // Restore transform
+  ctx.restore();
+}
+
+// Animation loop
+function animate(){
+  requestAnimationFrame(animate);
+
+  // Move physics bodies forward in time
+  world.step(1/60);
+
+  // Render scene
+  render();
+}
+</script>
+-->
+<body>
+
+  <!-- The canvas, where we draw stuff -->
+  <canvas width="600" height="400" id="myCanvas"></canvas>
+
+  <script>
+    var canvas, renderer, stage, graphics, ctx, w, h, world, boxBody, planeBody, mouseConstraint, mouseBody;
+    var scaleX = 50, scaleY = -50;
+    var interactionManager;
+
+    init();
+    animate();
+
+    function init(){
+
+        // Init canvas
+        canvas = document.getElementById("myCanvas");
+        w = canvas.width;
+        h = canvas.height;
+
+        renderer = new PIXI.CanvasRenderer(w,h,{view:canvas,transparent:true});
+        stage = new PIXI.Container();
+
+        // ctx = canvas.getContext("2d");
+        // ctx.lineWidth = 0.05;
+
+        //   interactionManager = new PIXI.interaction.InteractionManager();
+
+        //============================================================
+
+        // Init p2.js
+        world = new p2.World();
+
+        // Add a box
+        boxShape = new p2.Rectangle(2,1);
+        boxBody = new p2.Body({
+            mass:1,
+            position:[0,3],
+            angularVelocity:1
+        });
+        boxBody.addShape(boxShape);
+        world.addBody(boxBody);
+
+        // Add a plane
+        planeShape = new p2.Plane();
+        planeBody = new p2.Body();
+        planeBody.addShape(planeShape);
+        world.addBody(planeBody);
+
+        // Create a body for the cursor
+        mouseBody = new p2.Body();
+        world.addBody(mouseBody);
+
+        graphics = new PIXI.Graphics();
+        plane = new PIXI.Graphics();
+        stage.addChild(graphics);
+        stage.addChild(plane);
+
+        stage.position.x = w/2;
+        stage.position.y = h/2;
+        stage.scale.x = scaleX;
+        // stage.scale.y = -scaleY;
+
+        //============================================================
+
+        canvas.addEventListener('mousedown', function(event){
+
+            // Convert the canvas coordinate to physics coordinates
+            var position = getPhysicsCoord(event);
+
+            // Check if the cursor is inside the box
+            var hitBodies = world.hitTest(position, [boxBody]);
+
+            if(hitBodies.length){
+
+                // Move the mouse body to the cursor position
+                mouseBody.position[0] = position[0];
+                mouseBody.position[1] = position[1];
+
+                // Create a RevoluteConstraint.
+                // This constraint lets the bodies rotate around a common point
+                mouseConstraint = new p2.RevoluteConstraint(mouseBody, boxBody, {
+                    worldPivot: position,
+                    collideConnected:false
+                });
+                world.addConstraint(mouseConstraint);
+            }
+        });
+
+        // Sync the mouse body to be at the cursor position
+        canvas.addEventListener('mousemove', function(event){
+            var position = getPhysicsCoord(event);
+            mouseBody.position[0] = position[0];
+            mouseBody.position[1] = position[1];
+        });
+
+        // Remove the mouse constraint on mouse up
+        canvas.addEventListener('mouseup', function(event){
+            world.removeConstraint(mouseConstraint);
+            mouseConstraint = null;
+        });
+    }
+
+    // Convert a canvas coordiante to physics coordinate
+    function getPhysicsCoord(mouseEvent){
+        var rect = canvas.getBoundingClientRect();
+        var x = mouseEvent.clientX - rect.left;
+        var y = mouseEvent.clientY - rect.top;
+        // var x = mouseEvent.clientX;
+        // var y = mouseEvent.clientY;
+
+        x = (x - w / 2) / scaleX;
+        y = (y - h / 2) / scaleY;
+
+        return [x, y];
+    }
+
+    function drawbox(){
+        graphics.clear();
+        graphics.beginFill(0x333333);
+
+        var x = boxBody.position[0],
+            y = boxBody.position[1];
+
+        graphics.position.x = x;
+        graphics.position.y = y;
+        graphics.rotate = boxBody.angle;
+        // console.log(boxBody.angle);
+        graphics.drawRect(-boxShape.width/2, -boxShape.height/2, boxShape.width, boxShape.height);
+    //   ctx.beginPath();
+    //   var x = boxBody.position[0],
+    //       y = boxBody.position[1];
+    //   ctx.save();
+    //   ctx.translate(x, y);        // Translate to the center of the box
+    //   ctx.rotate(boxBody.angle);  // Rotate to the box body frame
+    //   ctx.rect(-boxShape.width/2, -boxShape.height/2, boxShape.width, boxShape.height);
+    //   ctx.stroke();
+    //   ctx.restore();
+    }
+
+    function drawPlane(){
+        plane.clear();
+        var y = planeBody.position[1];
+        plane.lineStyle(0.05,0,1);
+        plane.moveTo(-w, y);
+        plane.lineTo(w, y);
+    }
+
+    function render(){
+
+        stage.scale.x = scaleX;
+        stage.scale.y = scaleY;
+
+        drawbox();
+        drawPlane();
+
+        renderer.render(stage);
+        //   // Clear the canvas
+        //   ctx.clearRect(0,0,w,h);
+        //
+        //   // Transform the canvas
+        //   ctx.save();
+        //   ctx.translate(w/2, h/2); // Translate to the center
+        //   ctx.scale(scaleX, scaleY);
+        //
+        //   // Draw all bodies
+        //   drawbox();
+        //   drawPlane();
+        //
+        //   // Restore transform
+        // ctx.restore();
+    }
+
+    // Animation loop
+    function animate(){
+        requestAnimationFrame(animate);
+
+        // Move physics bodies forward in time
+        world.step(1/60);
+
+        // Render scene
+        render();
+    }
+
+ </script>
+
+</body>
+</html>
