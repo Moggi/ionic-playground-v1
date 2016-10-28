@@ -1,9 +1,11 @@
-# Ionic Circulos
+# ionic-playground
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Some testes made to learn Ionic (and Cordova)
+
+Everything from Jun 2015
 
 
-## Dependencies:
+## Dependences:
 
 * Nodejs (npm)
 * Cordova
@@ -28,12 +30,6 @@ $ brew install node
 $ sudo npm install -g cordova ionic bower gulp
 ```
 
-* Clone the repository
-```sh
-$ git clone https://phmoggi@bitbucket.org/phmoggi/ioniccirculos.git IonicCirculos
-$ cd IonicCirculos
-```
-
 * Build the project and run
 ```sh
 # If necessary, "ionic add platform <android/ios>"
@@ -46,3 +42,13 @@ $ ionic build android
 # But if there is no android device connected to deploy, then ionic will run on emulator
 $ ionic run android
 ```
+
+* Test locally
+```sh
+$ ionic serve
+```
+
+
+## Thanks
+
+- @leonardoguidolin
