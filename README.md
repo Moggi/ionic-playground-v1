@@ -51,4 +51,4 @@ $ ionic serve
 
 ## Thanks
 
-- @leonardoguidolin
+- [@leonardoguidolin](https://github.com/leonardoguidolin)
