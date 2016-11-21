@@ -1,6 +1,6 @@
-# ionic-playground
+# Ionic-playground
 
-Some testes made to learn Ionic (and Cordova)
+Some tests made to learn Ionic (and Cordova)
 
 Everything from Jun 2015
 
@@ -50,5 +50,5 @@ $ ionic serve
 
 
 ## Thanks
-
-- [@leonardoguidolin](https://github.com/leonardoguidolin)
+Leonardo Guidolin   
+- @leonardoguidolin
